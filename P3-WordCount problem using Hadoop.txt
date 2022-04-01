@@ -1,0 +1,117 @@
+1.  Open virtual box and then start cloudera quickstart
+
+2.  Open Eclipse present on the cloudera desktop
+
+3.  Create a new Java project clicking: File -> New -> Project -> Java Project -> Next (“WordCount” is the 
+project name)
+
+4.  Adding the Hadoop libraries to the project Click on Libraries -> Add External JARs Click on 
+File System -> usr -> lib -> hadoop Select all the libraries (JAR Files) -> click OK Click on 
+Add External jars, -> client -> select all jar files -> ok -> Finish
+
+5.  Right Click on the name of Project “WordCount” -> New -> class Don’t write anything 
+for package Write Name Textbox write “WordCount” -> Finish Then WordCount.java 
+window will pop up
+Add a below code
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+
+  public static class TokenizerMapper
+       extends Mapper<Object, Text, Text, IntWritable>{
+
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
+
+    public void map(Object key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+      StringTokenizer itr = new StringTokenizer(value.toString());
+      while (itr.hasMoreTokens()) {
+        word.set(itr.nextToken());
+        context.write(word, one);
+      }
+    }
+  }
+
+  public static class IntSumReducer
+       extends Reducer<Text,IntWritable,Text,IntWritable> {
+    private IntWritable result = new IntWritable();
+
+    public void reduce(Text key, Iterable<IntWritable> values,
+                       Context context
+                       ) throws IOException, InterruptedException {
+      int sum = 0;
+      for (IntWritable val : values) {
+        sum += val.get();
+      }
+      result.set(sum);
+      context.write(key, result);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf, "word count");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}
+
+6.  Right Click on the project name WordCount -> Export -> Java -> JAR File -> Next -> for 
+select the export destination for JAR file: browse -> Name : WordCount.jar -> save in folder 
+-> cloudera -> Finish -> OK
+
+7.  Verify jar file from terminal by using Open terminal & type “ ls ” There it will show WordCount.jar
+Check current working directory
+->pwd
+
+8.  We need to create an input file in local file system
+Creating an input file named as “abc”.
+
+9.   Now we have to move this input file to hdfs. For this we create a direcory on hdfs using 
+command hdfs dfs -mkdir /inputnew. 
+
+10.  Move the input file to this directory created in hdfs by using either put command or 
+copyFromLocal command.
+hdfs dfs -put /home/cloudera/Desktop/abc /inputdir/
+
+11.  Now checking whether the “abc” present in /inputdir directory of hdfs or not using 
+hdfs dfs -ls /inputdir
+
+12. See the content of this file 'abc' using
+hdfs dfs –cat /inputdir/abc
+
+13.  Running Mapreduce Program on Hadoop, syntax is hadoop jar jarFileName.jar ClassName 
+/InputFileAddress /outputdir
+
+hadoop jar /home/cloudera/WordCount.jar WordCount /inputdir/abc /outputdir
+14.  Now let’s check what we have inside this outputdir directory using command as 
+hdfs dfs -ls /outputdir
+
+15. Now we want to read the content of the part-r-00000 file which present inside the outputdir 
+using command 
+hdfs dfs -cat /outputdir/part-r-00000
+
+16. The same file can also be accessed using a browser.
+Hadoop->HDFS Namenode->Ultilities ->Browse the file system
+Click on Outputdir-> part-r-00000 -> Download -> Save file option -> open the file with same o/p.
+
