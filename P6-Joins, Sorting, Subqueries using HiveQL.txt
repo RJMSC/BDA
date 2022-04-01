@@ -1,0 +1,75 @@
+Restart services using below command
+1.	sudo /home/cloudera/cloudera-manager --force --express
+2.	Start all services
+3.	sudo -u hdfs hadoop dfsadmin -safemode leave
+
+4. Crete below two files in cloudera desktop.
+Customer.csv
+ID,Name,Age,Address,Salary
+1,Rahul,20,Mumbai,12500
+2,Shiv,22,New Delhi,8500
+3,Pratap,23,Punjab,10000
+4,Aakash,26,UP,15000
+5,Vinay,27,New Mumbai,7000
+6,Adesh,21,Gujart,9200
+7,Deepak,24,MP,12500
+
+Orders.csv
+Oid,Date,Customer_id,Amount
+102,2018-08-03,4,4000
+104,2018-04-21,1,2500
+101,2018-04-15,1,2200
+105,2018-11-12,2,4500
+
+Coomand:
+
+1.  hive
+
+2.  create database rjc_joins;
+    show databases;
+
+3.  use rjc_joins;
+
+4.  create table customers(ID int, Name string, Age int, Address string, Salary float)
+    row format delimited
+    fields terminated by ','
+    tblproperties("skip.header.line.count"="1");
+
+    show tables;
+
+    describe customers;
+
+5.  load data local inpath "/home/cloudera/Desktop/Customer.csv" into table customers;
+
+6.  create table orders(oid int, odate date, cid int, amount float)
+    row format delimited
+    fields terminated by ','
+    tblproperties("skip.header.line.count"="1");
+
+    describe orders;
+
+7.  load data local inpath "/home/cloudera/Desktop/Orders.csv" into table orders;
+
+JOIN
+Now first we apply the normal joins on the two tables using below command, we want to retrieve customer id, name, age from customers table and amount from the orders table and join perform on id of the customers and orders table.
+8.  select c.id, c.name, c.age, o.amount
+    from customers c JOIN orders o
+    on (c.id = o.cid);
+
+LEFT OUTER JOIN
+9.	select c.id, c.name, o.amount,o.odate 
+from customers c LEFT OUTER JOIN orders o 
+on (c.id = o.cid);
+
+RIGHT OUTER JOIN
+10.	select c.id, c.name, o.amount,o.odate
+from customers c RIGHT OUTER JOIN orders o
+on (c.id = o.cid);
+
+Sub Queries
+
+11.	select max(salary) from customers where customers.salary not in(select max(salary) from customers);
+
+12.	select salary from customers sort by salary desc limit 4;
+
+13.	select salary from(select salary from customers sort by salary desc limit 4) result sort by salary asc limit 1;

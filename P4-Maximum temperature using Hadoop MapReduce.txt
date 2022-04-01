@@ -1,0 +1,169 @@
+1. Create text file on Cloudera Desktop.
+
+temperature.txt
+0067011990999991950051507004+68750+023550FM12+038299999V0203301N00671220001CN9999999N9+00001+99999999999
+0043011990999991950051512004+68750+023550FM12+038299999V0203201N00671220001CN9999999N9+00221+99999999999
+0043011990999991950051518004+68750+023550FM12+038299999V0203201N00261220001CN9999999N9-00111+99999999999
+0043012650999991949032412004+62300+010750FM12+048599999V0202701N00461220001CN0500001N9+01111+99999999999
+0043012650999991949032418004+62300+010750FM12+048599999V0202701N00461220001CN0500001N9+00781+99999999999
+
+2.  Open virtual box and then start cloudera quickstart
+
+3. Open Eclipse present on the cloudera desktop
+
+4. Create a new Java project clicking: 
+File -> New -> Project -> Java Project -> Next (“MaxTemp” is the project name).
+
+5.  Adding the Hadoop libraries to the project Click on Libraries -> Add External JARs 
+Click on File System -> usr -> lib -> hadoop Select all the libraries (JAR Files) -> click OK Click on Add External jars, -> client -> select all jar files -> ok -> Finish
+
+6.Right Click on the name of Project “MaxTemp” -> New -> class Don’t write anything for package Write Name Textbox write 
+“MaxTemp” -> Finish Then MaxTemp.java window will pop up
+
+7. Paste the below code
+
+import java.io.IOException;
+//import java.util.*;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
+//import org.apache.hadoop.mapreduce.Reducer.Context;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+//import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+//import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.conf.Configuration;
+//import MaximumTemp.MaxTemperatureMapper;
+//import MaxTemp.MaxTemperatureReducer;
+public class MaxTemp {
+// Mapper
+ /*MaxTemperatureMapper class is static
+ * and extends Mapper abstract class
+ * having four Hadoop generics type
+ * LongWritable, Text, Text, Text.
+ */
+ public static class MaxTemperatureMapper extends
+ Mapper<LongWritable, Text, Text, IntWritable> {
+ // the data in our data set with
+ // this value is inconsistent data
+ //public static final int MISSING = 9999;
+ public void map(LongWritable key, Text value, Context context)
+ throws IOException, InterruptedException {
+ String line=value.toString();
+ String year=line.substring(15,19);
+ int airtemp;
+ if(line.charAt(87)=='+')
+ {
+ airtemp=Integer.parseInt(line.substring(88,92));
+ }
+ else
+ airtemp=Integer.parseInt(line.substring(87,92));
+ String q=line.substring(92,93);
+ if(airtemp!=9999 && q.matches("[01459]"))
+ {
+ context.write(new Text(year), new IntWritable(airtemp));
+ }
+ }
+ }
+// Reducer
+ /*MaxTemperatureReducer class is static
+ and extends Reducer abstract class
+ having four Hadoop generics type
+ Text, Text, Text, Text.
+ */
+ public static class MaxTemperatureReducer extends
+ Reducer<Text, IntWritable, Text, IntWritable> {
+ /**
+ * @method reduce
+ * This method takes the input as key and
+ * list of values pair from the mapper,
+ * it does aggregation based on keys and
+ * produces the final context.
+ */
+ public void reduce(Text key,Iterable<IntWritable> values, Context context)
+ throws IOException, InterruptedException {
+ int maxvalue= Integer.MIN_VALUE;
+ for (IntWritable value : values) {
+ maxvalue=Math.max(maxvalue, value.get());
+ }
+ context.write(key, new IntWritable(maxvalue));
+ }
+ }
+ /**
+ * @method main
+ * This method is used for setting
+ * all the configuration properties.
+ * It acts as a driver for map-reduce
+ * code.
+ */
+ public static void main(String[] args) throws Exception {
+ // reads the default configuration of the
+ // cluster from the configuration XML files
+ Configuration conf = new Configuration();
+ // Initializing the job with the
+ // default configuration of the cluster
+ // Job job = new Job(conf, "weather example");
+ Job job = Job.getInstance(conf, "weather example");
+ // Assigning the driver class name
+ job.setJarByClass(MaxTemp.class);
+ // Key type coming out of mapper
+ // job.setMapOutputKeyClass(Text.class);
+ // value type coming out of mapper
+ // job.setMapOutputValueClass(Text.class);
+ // Defining the mapper class name
+ job.setMapperClass(MaxTemperatureMapper.class);
+ // Defining the reducer class name
+ job.setReducerClass(MaxTemperatureReducer.class);
+ // Defining input Format class which is
+ // responsible to parse the dataset
+ // into a key value pair
+ job.setInputFormatClass(TextInputFormat.class);
+ // Defining output Format class which is
+ // responsible to parse the dataset
+ // into a key value pair
+ job.setOutputFormatClass(TextOutputFormat.class);
+ job.setOutputKeyClass(Text.class);
+ job.setOutputValueClass(IntWritable.class);
+ FileInputFormat.addInputPath(job, new Path(args[0]));
+ FileOutputFormat.setOutputPath(job, new Path(args[1]));
+ System.exit(job.waitForCompletion(true) ? 0 : 1);
+ }
+}
+
+
+8.  Right Click on the project name 
+MaxTemp -> Export -> Java -> JAR File -> Next -> for select the export destination for JAR file: browse -> 
+Name : MaxTemp.jar -> save in folder -> cloudera -> Finish -> OK
+
+9. Open terminal & type hdfs dfs -ls / command Here listing all the directory present in hdfs
+
+10.  Input file named as temperature which is present on desktop i.e. in local file system
+
+11.  Now we have to move this input file to hdfs. For this we create a direcory on hdfs using command 
+hdfs dfs -mkdir /tempip
+hdfs dfs -ls /
+
+12. Move the input file i.e. temperature to this directory created in hdfs
+hdfs dfs –put /home/cloudera/Desktop/temperature /tempip/
+
+13. Now checking whether the “temperature” present in /tempip directory of hdfs or not using  command 
+hdfs dfs -ls /tempip
+
+14. Running Mapreduce Program on Hadoop, syntax is-
+hadoop jar /home/cloudera/MaximumTemp.jar MaxTemp /tempip/temperature /tempop1
+
+15. hdfs dfs -ls /tempop1
+
+16. part-r-00000 file which present inside the tempop1 using command 
+hdfs dfs -cat /tempop1/part-r-00000
+
+17. Hadoop->HDFS Namenode->Ultilities ->Browse the file system
+click on tempop1 ->part-r-00000 ->Download -> Save File ->Open Saved file to see the O/p.
+
+
