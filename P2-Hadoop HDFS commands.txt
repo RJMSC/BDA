@@ -1,0 +1,88 @@
+1. Hadoop Version
+hadoop version 
+
+2. LS Command-
+hdfs dfs -ls /
+ 
+3. MKDIR Command-
+hdfs dfs -mkdir /rjclocal
+
+4. MKDIR Command-
+Create new file on desktop 'Sample_01'
+hdfs dfs -copyFromLocal home/cloudera/Desktop/Sample_01 /rjclocal
+hdfs dfs -ls /rjclocal
+
+5. Put Command-
+hdfs dfs -put /home/cloudera/Desktop/Sample_01 /rjclocal
+
+6.copyToLocal Command-
+hdfs dfs -copyToLocal /rjclocal/Sample /home/cloudera/Desktop
+
+7. CAT Command-
+hdfs dfs -cat /rjclocal/Sample_01
+
+8. Copy cp Command-
+hdfs dfs -mkdir /newdir
+hdfs dfs -ls /
+hdfs dfs -cp /rjclocal/Sample_01 /newdir
+hdfs dfs -ls /newdir
+
+9. Move mv Command-
+hdfs dfs -mv /rjclocal/Sample_01 /ouput_01
+hdfs dfs -ls /ouput_01
+
+10.	hdfs dfs -cat /ouput_01
+
+11. RM Command-
+hdfs dfs -rm /newdir/Sample_01
+hdfs dfs -rm -r /ouput_01
+
+12. MoveFromLocal Command-
+hdfs dfs -moveFromLocal /home/cloudera/Desktop/Sample_01 /rjclocal
+hdfs dfs -mkdir /rjclocal
+
+13. MoveToLocal Command-
+hdfs dfs -moveToLocal /home/cloudera/Desktop/Sample_01 /newdir/new_01
+
+14. tail Command-
+hdfs dfs -tail /rjclocal/Sample_01
+
+15. Expunge Command-
+hdfs dfs -expunge
+
+16. Replication Command-
+Browser ->localhost:50070 ->Utilities ->Browse the file System -> Check the rjclocal replication count
+hdfs dfs -setrep 4 /rjclocal
+Check the same in browser.
+
+17. DU Command-
+hdfs dfs -du /rjclocal
+
+18. Df command-
+hdfs dfs -df
+hdfs dfs -df -h 
+
+19. Fsck command
+hdfs fsck /rjclocal
+hdfs fsck /rjclocal -files
+
+20. Touchz Command
+hdfs dfs -touchz /rjclocal/empFirst_01
+hdfs dfs -ls /rjclocal
+
+21. Stat Command
+hdfs dfs -stat /rjclocal
+
+hdfs dfs -stat %b /rjclocal/empFirst_01
+hdfs dfs -stat %o /rjclocal/empFirst_01 
+hdfs dfs -stat %r /rjclocal/empFirst_01
+hdfs dfs -stat %y /rjclocal/empFirst_01
+
+22. Checksum Command	
+hdfs dfs -checksum /rjclocal/empFirst_01
+
+23. Help command
+hdfs dfs -help rm
+
+24. Get command
+hdfs dfs -get /rjclocal/Sample_01 /home/cloudera/Desktop
