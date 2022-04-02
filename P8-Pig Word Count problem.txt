@@ -1,0 +1,36 @@
+1) Start the cloudera ->Open the browser ->Open Hue and login(cloudera,cloudera)
+
+2) Now open the directory /user/cloudera
+Type /hue/filebrowser
+
+3) Creating the directory as Training inside /user/cloudera
+
+4) After creating Training directory now creating the pig directory inside Training.
+
+5) pig directory has been created inside /user/cloudera/Training 
+
+6) Creating input.txt file inside /usr/cloudera/training/pig directory
+
+7) Adding some contents to this input.txt file
+
+8) Click on Edit file option
+
+9)  Open the terminal ->pig
+
+10) Input1 = LOAD ‘/usr/cloudera/Training/pig/input.txt’ AS (f1:chararray);
+
+11) DUMP input1;
+
+12) wordsInEachLine = FOREACH input1 GENERATE flatten(TOKENIZE(f1)) as word;
+
+13) DUMP wordsInEachLine;
+
+14) groupedWords = group wordsInEachLine by word;
+
+15) DUMP groupedWords;
+
+16) countedWords = foreach groupedWords generate group, COUNT(wordsInEachLine)
+
+17) DUMP countedWords;
+
+17) Exit from the grunt shell -> quit command
