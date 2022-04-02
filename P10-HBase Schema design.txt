@@ -1,0 +1,85 @@
+1. Command prompt -> sudo /home/cloudera/cloudera-manager --force –express
+
+2. Restart service -> go to browser -> quickstart.cloudera:7180/cmf/login -> cloudera,cloudera
+
+3. sudo /home/cloudera/cloudera-manager --force –express
+
+4. hbase shell
+
+5. > list
+
+6. Restart HBase services
+$ sudo su
+$ service hbase-master restart
+$ service hbase-regionserver restart
+
+7. >create 'customer', 'address','order'
+   
+>list
+
+8. put
+put 'customer','Nick','address:city','Mumbai'
+put 'customer','Nick','address:state','Maharashtra'
+put 'customer','Nick','address:street','Steet1'
+put 'customer','Nick','order:number','ORD-15'
+put 'customer','Nick','order:amount','50'
+
+put 'customer','Justin','address:city','Pune'
+put 'customer','Justin,'address:state','Maharashtra'
+put 'customer','Justin','address:street','Steet2'
+put 'customer','Justin','order:number','ORD-16'
+put 'customer','Justin','order:amount','60'
+
+9. Get
+get 'customer', 'Nick'
+get 'customer', 'Nick' , 'address'
+get 'customer', 'Nick' , 'address:city'
+
+10. Scan
+>scan ‘customer’
+
+11. Delete
+delete 'customer', 'Nick' ,'address:street'
+
+12. Alter
+alter 'customer', 'delete' => 'address'
+
+>scan ‘customer’
+
+13. Describe
+desc 'customer'
+
+14. Version
+create 'customer1', {NAME => 'address', VERSIONS => 3}
+
+>list
+
+15. Count
+count 'customer'
+
+16. Alter -Update the version number
+alter 'customer' , NAME => 'address', VERSIONS =>5
+
+>desc ‘customer’
+
+>scan ‘customer’
+
+17. put command
+
+put 'customer', 'Nick' , 'address:city', 'Pune'
+put 'customer', 'Nick' , 'address:city', 'Bangalore
+put 'customer', 'Nick' , 'address:city', 'Delhi'
+
+>scan 'customer', {COLUMN=> 'address:city', VERSIONS => 2}
+>scan 'customer', {COLUMN=> 'address:city', VERSIONS => 3}
+>scan 'customer', {COLUMN=> 'address:city', VERSIONS => 4}
+
+>scan 'customer', {COLUMN=> 'address:city', VERSIONS => 5}
+
+scan 'customer', {VERSIONS => 5 } – This for all columns not for any specific column
+
+
+18. Disable - This command will start disabling the named table
+
+19.Drop
+drop 'customer'
