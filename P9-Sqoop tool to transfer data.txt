@@ -1,0 +1,83 @@
+-- right click and open terminal, create 2 diffrent terminal.
+
+1. (terminal 1) Open terminal in cloudera
+username as root and password as cloudera
+>mysql -u root -pcloudera
+
+2. (terminal 1) 
+>show databases;
+
+3. (terminal 1) 
+>use retail_db;
+
+4. (terminal 1) 
+>show tables;
+
+5. (terminal 1) 
+>select * from customers;
+
+6. (terminal 1) 
+>select * from departments;
+
+7. 
+>Open the new terminal for running command for sqoop.(terminal 2) 
+
+8. (terminal 2) 
+>hostname –f 
+
+9. (terminal 2) 
+>sqoop list-databases --connect jdbc:mysql://quickstart:3306/ --password cloudera --username root;
+
+10. (terminal 2) 
+>sqoop list-tables --connect jdbc:mysql://quickstart:3306/retail_db --password cloudera --username root;
+
+11. (terminal 2) 
+>sqoop import --connect jdbc:mysql://quickstart:3306/retail_db --password cloudera --username root --table departments;
+
+12. (terminal 2) 
+>hadoop fs –ls
+
+13. (terminal 2) 
+>hadoop fs –ls deparments;
+
+14. (terminal 2)
+hadoop fs -cat /user/cloudera/departments/part-m-00000
+hadoop fs -cat /user/cloudera/departments/part-m-00001
+hadoop fs -cat /user/cloudera/departments/part-m-00002
+hadoop fs -cat /user/cloudera/departments/part-m-00003
+
+15. (terminal 2) 
+>hadoop fs -cat /user/cloudera/departments/part*
+
+16. (terminal 2) 
+>sqoop import --connect jdbc:mysql://quickstart:3306/retail_db --password cloudera --username root --table departments --target-dir /user/cloudera/department1
+
+17. (terminal 2) 
+>hadoop fs -ls
+
+18. (terminal 2) 
+>hadoop fs -ls /user/cloudera/department1
+
+19. (terminal 2) 
+>hadoop fs -cat /user/cloudera/department1/part*
+
+20. (terminal 2) 
+>sqoop import --connect jdbc:mysql://quickstart:3306/retail_db --password cloudera --username root --table departments --where "department_id>4" --target-dir /user/cloudera/department2;
+
+21. (terminal 2) 
+>hadoop fs -ls /user/cloudera/department2
+
+22. (terminal 2) 
+>hadoop fs -cat /user/cloudera/department2/part*
+
+23. (terminal 1) 
+>create table dpt(department_id int not null auto_increment, department_name varchar(50) not null, primary key(department_id));
+
+24. (terminal 1) 
+>Select * from dpt;
+
+25. (terminal 2) 
+>sqoop export --connect jdbc:mysql://quickstart:3306/retail_db --password cloudera --username root --table dpt --export-dir /user/cloudera/department2;
+
+26. (terminal 1)
+>Select * from dpt;
